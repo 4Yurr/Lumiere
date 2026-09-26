@@ -1,0 +1,17 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Container, Card, Badge } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { LoadingSpinner, EmptyState } from '@/components/ui/modal';
+import { invitationService } from '@/services/invitation.service';
+import { useAuth } from '@/hooks/use-auth';
+import { Invitation } from '@/types';
+import { formatDate } from '@/lib/utils';
+import { ArrowRight, ExternalLink, Plus } from 'lucide-react';
+
+const statusLabels: Record<string, string> = { DRAFT: 'Draft', PENDING_PAYMENT: 'Menunggu pembayaran', ACTIVE: 'Aktif', EXPIRED: 'Kedaluwarsa', DISABLED: 'Dinonaktifkan' };
+
+export default function DashboardPage() { const router = useRouter(); const { user, isLoading: authLoading } = useAuth(); const [items, setItems] = useState<Invitation[]>([]); const [loading, setLoading] = useState(true); useEffect(() => { if (!authLoading && !user) { router.replace('/login?next=/dashboard'); return; } if (user) invitationService.getMyInvitations().then(setItems).catch(() => setItems([])).finally(() => setLoading(false)); }, [authLoading, user, router]); if (authLoading || (!user && loading)) return <LoadingSpinner text="Menyiapkan dashboard..." />; return <Container className="py-10 md:py-16"><div className="flex flex-col gap-5 border-b border-stone-200 pb-8 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9A7730]">Ruang pribadi</p><h1 className="mt-2 text-4xl font-serif-luxury font-bold text-slate-900">Undangan saya</h1><p className="mt-3 text-sm text-stone-500">Halo, {user?.name}. Semua cerita yang sedang Anda susun ada di sini.</p></div><Link href="/invitation"><Button variant="gold" className="flex items-center gap-2"><Plus className="h-4 w-4" />Buat undangan</Button></Link></div>{loading ? <LoadingSpinner text="Memuat undangan Anda..." /> : items.length ? <div className="mt-8 grid gap-5">{items.map((item) => <Card key={item.id} className="p-6"><div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h2 className="text-xl font-serif-luxury font-bold text-slate-900">{item.data?.title || item.template?.name || 'Undangan tanpa judul'}</h2><Badge variant={item.status === 'ACTIVE' ? 'success' : item.status === 'PENDING_PAYMENT' ? 'warning' : 'default'}>{statusLabels[item.status] || item.status}</Badge></div><p className="mt-2 text-sm text-stone-500">Template: {item.template?.name || '-'} · Dibuat {formatDate(item.createdAt)}</p><p className="mt-1 text-xs text-stone-400">/{item.slug}</p></div><div className="flex flex-wrap gap-2"><Link href={`/invitation/preview?slug=${item.slug}`}><Button variant="outline" size="sm" className="flex items-center gap-1"><ExternalLink className="h-3.5 w-3.5" />Lihat</Button></Link><Link href={`/invitation/create?template=${item.template?.slug || ''}`}><Button variant="ghost" size="sm">Edit</Button></Link>{item.status === 'DRAFT' && <Link href={`/invitation/payment?invitation=${item.id}`}><Button variant="gold" size="sm" className="flex items-center gap-1">Bayar<ArrowRight className="h-3.5 w-3.5" /></Button></Link>}</div></div></Card>)}</div> : <EmptyState title="Belum ada undangan" description="Pilih template pertama Anda dan mulai isi detail acaranya." actionLabel="Pilih template" onAction={() => router.push('/invitation')} />}</Container>; }

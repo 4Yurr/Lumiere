@@ -1,0 +1,15 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { Photographer } from '@/types';
+import { photographerService } from '@/services/photographer.service';
+import { Container, Badge } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PlaceholderImage } from '@/components/ui/placeholder-image';
+import { PortfolioGrid } from '@/components/photographer/portfolio-grid';
+import { LoadingSpinner, EmptyState } from '@/components/ui/modal';
+import { formatRupiah, getAdminWhatsAppUrl } from '@/lib/utils';
+import { MapPin, MessageCircle } from 'lucide-react';
+
+export default function PhotographerDetailPage() { const { slug } = useParams<{ slug: string }>(); const [photographer, setPhotographer] = useState<Photographer | null>(null); const [loading, setLoading] = useState(true); useEffect(() => { if (slug) photographerService.getBySlug(slug).then(setPhotographer).catch(() => setPhotographer(null)).finally(() => setLoading(false)); }, [slug]); if (loading) return <LoadingSpinner text="Memuat profil fotografer..." />; if (!photographer) return <EmptyState title="Fotografer tidak ditemukan" description="Profil mungkin sudah tidak tersedia." />; const isWedding = photographer.category?.name?.toLowerCase().includes('pernikahan'); const message = `Halo Admin Lumiere, saya tertarik dengan fotografer ${photographer.name}. Mohon info jadwal dan paket yang tersedia.`; return <Container className="py-10 md:py-16"><div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr]"><div><PlaceholderImage src={photographer.profileImage} alt={photographer.name} aspectRatio="portrait" category={isWedding ? 'wedding' : 'photographer'} className="rounded-3xl" /></div><div><Badge variant={isWedding ? 'gold' : 'info'}>{photographer.category?.name || 'Fotografer'}</Badge><h1 className="mt-3 text-4xl font-serif-luxury font-bold text-slate-900">{photographer.name}</h1><div className="mt-3 flex items-center gap-2 text-sm text-stone-500"><MapPin className="h-4 w-4 text-[#C5A059]" />{photographer.location || 'Indonesia'}</div><p className="mt-6 text-sm leading-7 text-stone-600">{photographer.description || 'Fotografer pilihan Lumiere untuk mengabadikan cerita Anda dengan penuh perhatian.'}</p><div className="mt-8 rounded-2xl border border-stone-200 bg-[#FAF7F2] p-5"><p className="text-xs uppercase tracking-wider text-stone-400">Harga mulai</p><p className="mt-1 text-2xl font-bold text-slate-900">{formatRupiah(photographer.startingPrice)}</p></div><a href={getAdminWhatsAppUrl(message)} target="_blank" rel="noreferrer"><Button variant="gold" size="lg" className="mt-6 flex w-full items-center justify-center gap-2 sm:w-auto"><MessageCircle className="h-4 w-4" />Hubungi Admin Lumiere</Button></a></div></div><section className="mt-16"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9A7730]">Portfolio</p><h2 className="mt-2 text-3xl font-serif-luxury font-bold text-slate-900">Karya yang pernah dikerjakan</h2><div className="mt-7"><PortfolioGrid portfolios={photographer.portfolios || []} /></div></section></Container>; }

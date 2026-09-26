@@ -1,0 +1,11 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { LoadingSpinner } from '@/components/ui/modal';
+import { LayoutDashboard, LogOut, Sparkles } from 'lucide-react';
+
+const links = [['templates', 'Templates'], ['invitations', 'Invitations'], ['orders', 'Orders'], ['payments', 'Payments'], ['photographers', 'Photographers'], ['portfolios', 'Portfolios'], ['users', 'Users']];
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) { const pathname = usePathname(); const router = useRouter(); const { user, isAdmin, isLoading, logout } = useAuth(); if (isLoading) return <LoadingSpinner text="Memeriksa akses admin..." />; if (!user || !isAdmin) { router.replace('/login'); return null; } return <div className="min-h-screen bg-slate-950 text-white"><aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-white/10 bg-slate-950 p-5 lg:block"><Link href="/admin" className="flex items-center gap-2 border-b border-white/10 pb-6"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#C5A059] text-slate-950"><Sparkles className="h-4 w-4" /></span><span className="font-serif-luxury text-lg font-bold tracking-widest">LUMIERE</span></Link><nav className="mt-7 space-y-1"><Link href="/admin" className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm ${pathname === '/admin' ? 'bg-white/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><LayoutDashboard className="h-4 w-4" />Overview</Link>{links.map(([slug, label]) => <Link key={slug} href={`/admin/${slug}`} className={`block rounded-xl px-3 py-2 text-sm ${pathname?.startsWith(`/admin/${slug}`) ? 'bg-white/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>{label}</Link>)}</nav><button onClick={() => logout().then(() => router.push('/login'))} className="mt-8 flex items-center gap-2 px-3 text-sm text-slate-400 hover:text-white"><LogOut className="h-4 w-4" />Keluar</button></aside><main className="min-h-screen lg:pl-64"><div className="border-b border-white/10 px-5 py-4 lg:px-10"><p className="text-xs uppercase tracking-[0.18em] text-[#C5A059]">Lumiere Admin</p><p className="mt-1 text-sm text-slate-400">Kelola katalog, pesanan, dan pengguna</p></div>{children}</main></div>; }

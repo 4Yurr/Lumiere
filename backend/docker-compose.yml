@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lumiere_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: lumiere_user
+      POSTGRES_PASSWORD: lumiere_password
+      POSTGRES_DB: lumiere_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lumiere_backend
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://lumiere_user:lumiere_password@postgres:5432/lumiere_db?schema=public
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-change_this_in_production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+    ports:
+      - '3000:3000'
+    command: >
+      sh -c "npx prisma migrate deploy && node dist/main.js"
+
+volumes:
+  postgres_data:
