@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -14,6 +15,17 @@ export function Navbar() {
   const [photographerDropdown, setPhotographerDropdown] = useState(false);
   const pathname = usePathname();
   const { user, logout, isAdmin } = useAuth();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   // Do not render default navbar in admin section
   if (pathname?.startsWith('/admin')) {
@@ -177,6 +189,9 @@ export function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-stone-700 hover:text-stone-900 p-2"
+              aria-label={isOpen ? 'Tutup menu' : 'Buka menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -185,17 +200,39 @@ export function Navbar() {
       </div>
 
       {/* Mobile Drawer */}
-      {isOpen && (
-        <div className="md:hidden bg-[#FAF8F5] border-b border-[#E8E2D8] px-4 pt-2 pb-6 space-y-3">
-          <Link
-            href="/"
+      {isOpen && createPortal(
+        <div className="md:hidden">
+          <button
+            type="button"
+            aria-label="Tutup menu"
             onClick={() => setIsOpen(false)}
-            className="block py-2 text-sm font-medium text-stone-800"
+            className="fixed inset-0 z-[100] bg-slate-950/40"
+          />
+          <nav
+            id="mobile-navigation"
+            aria-label="Navigasi mobile"
+            className="fixed inset-y-0 right-0 z-[101] w-1/2 min-w-0 overflow-y-auto border-l border-[#E8E2D8] bg-[#FAF8F5] px-4 pt-6 pb-8 shadow-2xl animate-mobile-drawer-in sm:px-5"
           >
-            Beranda
-          </Link>
-          <div className="border-t border-stone-200/60 pt-2">
-            <p className="text-xs uppercase tracking-wider text-stone-400 font-semibold mb-1">Undangan Digital</p>
+            <div className="mb-5 flex items-center justify-between">
+              <p className="font-serif-luxury text-lg font-bold tracking-wide text-slate-900">Menu</p>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                aria-label="Tutup menu"
+                className="rounded-full p-2 text-stone-700 hover:bg-stone-200/70"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <Link
+              href="/"
+              onClick={() => setIsOpen(false)}
+              className="block py-2 text-sm font-medium text-stone-800"
+            >
+              Beranda
+            </Link>
+            <div className="border-t border-stone-200/60 pt-3 mt-2">
+              <p className="text-xs uppercase tracking-wider text-stone-400 font-semibold mb-1">Undangan Digital</p>
             <Link
               href="/invitation"
               onClick={() => setIsOpen(false)}
@@ -217,9 +254,9 @@ export function Navbar() {
             >
               💍 Undangan Pernikahan
             </Link>
-          </div>
-          <div className="border-t border-stone-200/60 pt-2">
-            <p className="text-xs uppercase tracking-wider text-stone-400 font-semibold mb-1">Fotografer</p>
+            </div>
+            <div className="border-t border-stone-200/60 pt-3 mt-2">
+              <p className="text-xs uppercase tracking-wider text-stone-400 font-semibold mb-1">Fotografer</p>
             <Link
               href="/photographer"
               onClick={() => setIsOpen(false)}
@@ -241,42 +278,44 @@ export function Navbar() {
             >
               ✨ Wedding & Pre-wedding
             </Link>
-          </div>
-          <div className="border-t border-stone-200/60 pt-4 flex flex-col gap-2">
-            {user ? (
-              <>
-                {isAdmin && (
-                  <Link href="/admin" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Admin Backoffice
+            </div>
+            <div className="border-t border-stone-200/60 pt-4 mt-2 flex flex-col gap-2">
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link href="/admin" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full">
+                        Admin Backoffice
+                      </Button>
+                    </Link>
+                  )}
+                  <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Button variant="primary" size="sm" className="w-full">
+                      Dashboard ({user.name})
                     </Button>
                   </Link>
-                )}
-                <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                  <Button variant="primary" size="sm" className="w-full">
-                    Dashboard ({user.name})
+                  <Button variant="outline" size="sm" onClick={() => { logout(); setIsOpen(false); }} className="w-full text-rose-600">
+                    Keluar
                   </Button>
-                </Link>
-                <Button variant="outline" size="sm" onClick={() => { logout(); setIsOpen(false); }} className="w-full text-rose-600">
-                  Keluar
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Masuk
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setIsOpen(false)}>
-                  <Button variant="gold" size="sm" className="w-full">
-                    Daftar Sekarang
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Masuk
+                    </Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsOpen(false)}>
+                    <Button variant="gold" size="sm" className="w-full">
+                      Daftar Sekarang
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </nav>
+        </div>,
+        document.body,
       )}
     </nav>
   );

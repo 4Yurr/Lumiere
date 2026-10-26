@@ -53,7 +53,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* 1. Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-32 bg-gradient-to-b from-[#FAF8F5] via-[#F4ECE1]/40 to-[#FAF8F5]">
+      <section className="relative overflow-hidden pt-12 pb-0 md:pt-20 md:pb-0 bg-gradient-to-b from-[#FAF8F5] via-[#F4ECE1]/40 to-[#FAF8F5]">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#C5A059_1px,transparent_1px)] [background-size:24px_24px]" />
 
         {/* Decorative blur aura */}
@@ -91,7 +91,7 @@ export default function HomePage() {
           </div>
 
           {/* Partner Logo Marquee */}
-          <div className="relative left-1/2 mt-12 w-screen max-w-none -translate-x-1/2 overflow-hidden border-y border-[#E8E2D8] bg-white/70 py-5 shadow-sm sm:mt-14">
+          <div className="relative left-1/2 mt-12 w-screen max-w-none -translate-x-1/2 overflow-hidden border-y border-[#E8E2D8] bg-[#F4ECE1]/80 py-5 shadow-sm sm:mt-14">
             <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 sm:text-xs">
               Bersama kreator dan partner pilihan
             </p>
@@ -106,13 +106,13 @@ export default function HomePage() {
                     aria-hidden={copy === 1}
                   >
                     {partnerLogos.map((partner) => (
-                      <div key={partner.src} className="flex h-10 w-28 shrink-0 items-center justify-center sm:w-36">
+                      <div key={partner.src} className="flex h-12 w-32 shrink-0 items-center justify-center sm:w-40">
                         <Image
                           src={partner.src}
                           alt={partner.name}
-                          width={144}
-                          height={40}
-                          className="h-10 w-full object-contain"
+                          width={160}
+                          height={48}
+                          className="h-12 w-full object-contain"
                         />
                       </div>
                     ))}
@@ -122,21 +122,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-16 max-w-2xl mx-auto border-t border-stone-200/60 mt-12 text-center">
-            <div>
-              <p className="text-2xl font-serif-luxury font-bold text-slate-900">100%</p>
-              <p className="text-xs text-stone-500 mt-0.5">Kustomisasi Digital</p>
-            </div>
-            <div>
-              <p className="text-2xl font-serif-luxury font-bold text-slate-900">Resmi</p>
-              <p className="text-xs text-stone-500 mt-0.5">Jaringan Fotografer</p>
-            </div>
-            <div className="col-span-2 sm:col-span-1">
-              <p className="text-2xl font-serif-luxury font-bold text-slate-900">Instant</p>
-              <p className="text-xs text-stone-500 mt-0.5">Aktivasi Undangan</p>
-            </div>
-          </div>
         </Container>
       </section>
 
