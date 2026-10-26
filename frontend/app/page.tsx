@@ -27,7 +27,6 @@ const partnerLogos = [
   { name: 'Logo partner 1', src: '/partners/1.svg' },
   { name: 'Logo partner 2', src: '/partners/2.svg' },
   { name: 'Logo partner 3', src: '/partners/3.svg' },
-  { name: 'Logo global', src: '/global/logo.svg' },
 ];
 
 export default function HomePage() {

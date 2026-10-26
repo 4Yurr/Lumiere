@@ -27,7 +27,7 @@ export function Navbar() {
           {/* Brand Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
             <div className="relative w-[60px] h-[60px] overflow-hidden rounded-full bg-slate-900 shadow-sm group-hover:scale-105 transition-transform">
-              <Image src="/logo.svg" alt="Lumière" fill className="object-contain p-0.5" priority />
+              <Image src="/global/logo.svg" alt="Lumière" fill className="object-contain p-0.5" priority />
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-serif-luxury font-bold tracking-widest text-slate-900">
