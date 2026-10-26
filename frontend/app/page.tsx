@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Template, Photographer } from '@/types';
 import { templateService } from '@/services/template.service';
 import { photographerService } from '@/services/photographer.service';
@@ -21,6 +22,13 @@ import {
   Palette,
   CheckCircle2,
 } from 'lucide-react';
+
+const partnerLogos = [
+  { name: 'Logo partner 1', src: '/partners/1.svg' },
+  { name: 'Logo partner 2', src: '/partners/2.svg' },
+  { name: 'Logo partner 3', src: '/partners/3.svg' },
+  { name: 'Logo global', src: '/global/logo.svg' },
+];
 
 export default function HomePage() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -81,6 +89,38 @@ export default function HomePage() {
                 <Camera className="w-4 h-4 text-[#C5A059]" />
               </Button>
             </Link>
+          </div>
+
+          {/* Partner Logo Marquee */}
+          <div className="relative left-1/2 mt-12 w-screen max-w-none -translate-x-1/2 overflow-hidden border-y border-[#E8E2D8] bg-white/70 py-5 shadow-sm sm:mt-14">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 sm:text-xs">
+              Bersama kreator dan partner pilihan
+            </p>
+            <div className="group relative flex overflow-hidden" aria-label="Logo partner Lumière">
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#FAF9F6] to-transparent sm:w-20" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#FAF9F6] to-transparent sm:w-20" />
+              <div className="flex w-max animate-marquee-right group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+                {[0, 1].map((copy) => (
+                  <div
+                    key={copy}
+                    className="flex shrink-0 items-center gap-10 px-5 sm:gap-16 sm:px-8"
+                    aria-hidden={copy === 1}
+                  >
+                    {partnerLogos.map((partner) => (
+                      <div key={partner.src} className="flex h-10 w-28 shrink-0 items-center justify-center sm:w-36">
+                        <Image
+                          src={partner.src}
+                          alt={partner.name}
+                          width={144}
+                          height={40}
+                          className="h-10 w-full object-contain"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Quick Metrics Bar */}
